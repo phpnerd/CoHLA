@@ -10,7 +10,7 @@ The structure of this repository is as follows.
 
 * **cohla** contains the sources of the DSL itself. At this time, these are still being refactored, so we'll commit them as soon as the refactoring has finished.
 * **docs** contains the documentation regarding both the installation of CoHLA and all of its dependencies as well as a manual on how to use CoHLA and generate code from it.
-* **libs** contains the C++ libraries that have been developed for use with OpenRTI. CoHLA generates code for use with these libraries.
+* **libs** contains the C++ libraries that have been developed for use with [OpenRTI](https://sourceforge.net/projects/openrti/). CoHLA generates code for use with these libraries.
 
 ## Installation
 When the sources will be available, the CoHLA DSL project can be imported by creating a new Xtext project having the name ```nl.ru.ws.cohla``` with extension "cohla,hla".
