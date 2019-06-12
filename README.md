@@ -13,7 +13,7 @@ The structure of this repository is as follows.
 * **libs** contains the C++ libraries that have been developed for use with [OpenRTI](https://sourceforge.net/projects/openrti/). CoHLA generates code for use with these libraries.
 
 ## Installation
-When the sources will be available, the CoHLA DSL project can be imported by creating a new Xtext project having the name ```nl.ru.ws.cohla``` with extension "cohla".
+When the sources will be available, the CoHLA DSL project can be imported by creating a new Xtext project having the name ```nl.ru.sws.cohla``` with extension "cohla".
 
 Until then, the CoHLA extension for Eclipse can be installed by adding the repository as software source to Eclipse.
 The repository location is [https://files.thomasnagele.nl/cohla/plugin/](https://files.thomasnagele.nl/cohla/plugin/).
