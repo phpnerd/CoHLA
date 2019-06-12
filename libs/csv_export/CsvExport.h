@@ -45,12 +45,12 @@ protected:
     void fill();
 
     void add(long double time, string column, string type, VariableLengthData data);
-    void add(long double time, string column, double value);
-    void add(long double time, string column, float value);
-    void add(long double time, string column, int value);
-    void add(long double time, string column, short value);
-    void add(long double time, string column, long value);
-    void add(long double time, string column, bool value);
+    void add(long double time, string &column, double value);
+    void add(long double time, string &column, float value);
+    void add(long double time, string &column, int value);
+    void add(long double time, string &column, short value);
+    void add(long double time, string &column, long value);
+    void add(long double time, string &column, bool value);
     void add(long double time, string &column, string value);
 
     void setAttribute(string, string) override;

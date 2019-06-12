@@ -27,6 +27,7 @@ public:
     void init() override;
     void setConfig(string, string, string, string, string);
     void run() override;
+    void stop() override;
     void stopLogging();
 
 protected:

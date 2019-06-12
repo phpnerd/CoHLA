@@ -48,9 +48,9 @@ void federate::init() {
     publish();
     registerObjectInstance();
     setTimePolicy();
-    waitAndSynchronise();
     setSubscribedAttributes();
     subscribe();
+    waitAndSynchronise();
 }
 
 void federate::connect() {
@@ -225,7 +225,7 @@ void federate::publishAttributeValues(long double time) {
             attributes[attributeHandles[topology.getClass(federateName)][attr_pair.first]] = attributeValues[attr_pair.first];
     if (attributes.empty())
         return;
-    if (fed->isRegulating && time > 0)
+    if (fed->isRegulating && time >= 0)
         rti->updateAttributeValues(objectInstanceHandle, attributes, toVariableLengthData(""), convertTime(time));
     else
         rti->updateAttributeValues(objectInstanceHandle, attributes, toVariableLengthData(""));
@@ -239,9 +239,9 @@ void federate::reflectAttributeValues(ObjectInstanceHandle oiHandle, AttributeHa
 
 void federate::applyModifiers(long double time) {
     if (scenario)
-        scenario->apply(time);
+        scenario->apply(time + fed->federateLookahead);
     for (auto &fault : internalFaults)
-        if (fault->doApply(time))
+        if (fault->doApply(time + fed->federateLookahead))
             setAttribute(fault->getReference().getAttribute(), fault->apply(getAttribute(fault->getReference().getAttribute())));
 }
 
@@ -274,7 +274,7 @@ long double federate::awaitTimeAdvanceGrant() {
 }
 
 void federate::setPublishedChangedState(set<string> updatedAttributes) {
-    for (string a : updatedAttributes)
+    for (const string& a : updatedAttributes)
         if (publishedAttributes.find(a) != publishedAttributes.end())
             publishedAttributes[a].update();
 }

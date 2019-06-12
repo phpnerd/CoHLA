@@ -131,40 +131,49 @@ static string toFirstUpper(string str) {
 }
 
 template <typename T>
-static T toType(VariableLengthData data) {
+static T toType(const VariableLengthData data) {
     return nullptr;
 }
 
 template <>
-bool toType<bool>(VariableLengthData data) {
+bool toType<bool>(const VariableLengthData data) {
     HLAboolean b;
     b.decode(data);
     return b.get();
 }
 
 template <>
-int toType<int>(VariableLengthData data) {
-    HLAinteger32BE i;
-    i.decode(data);
-    return i.get();
+int toType<int>(const VariableLengthData data) {
+    if (data.size() == 4) {
+        HLAinteger32BE i;
+        i.decode(data);
+        return i.get();
+    } else
+        return toType<bool>(data);
 }
 
 template <>
-long toType<long>(VariableLengthData data) {
-    HLAinteger64BE i;
-    i.decode(data);
-    return i.get();
+long toType<long>(const VariableLengthData data) {
+    if (data.size() == 8) {
+        HLAinteger64BE i;
+        i.decode(data);
+        return i.get();
+    } else
+        return toType<bool>(data);
 }
 
 template <>
-double toType<double>(VariableLengthData data) {
-    HLAfloat64BE f;
-    f.decode(data);
-    return f.get();
+double toType<double>(const VariableLengthData data) {
+    if (data.size() == 8) {
+        HLAfloat64BE f;
+        f.decode(data);
+        return f.get();
+    } else
+        return toType<bool>(data);
 }
 
 template <>
-string toType<string>(VariableLengthData data) {
+string toType<string>(const VariableLengthData data) {
     HLAASCIIstring s;
     s.decode(data);
     return s.get();

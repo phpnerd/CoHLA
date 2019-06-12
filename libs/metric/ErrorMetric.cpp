@@ -18,19 +18,23 @@ ErrorMetric<T>::ErrorMetric(const string &name, bool squared, pair<string, strin
 template<typename T>
 T ErrorMetric<T>::compute() {
     list<pair<double, T>> error;
-    auto refIt = this->getRefAttributeData().begin();
+    auto refData = this->getRefAttributeData();
+    auto refIt = refData.begin();
     double pTime = 0.0;
     for (auto const &value : this->getAttributeData()) {
         pair<double, T> err;
-        if (value.first > refIt->first) {
-            err.first = refIt->first - pTime;
-            err.second = value.second - refIt->second;
-            pTime = refIt->first;
-            error.push_back(err);
-            refIt++;
-        }
-        if (value.first == refIt->first)
+        if (value.first > refIt->first && std::next(refIt)->first < value.first) {
+            while (value.first > refIt->first && std::next(refIt)->first < value.first) {
+                refIt++;
+                err.first = refIt->first - pTime;
+                err.second = value.second - refIt->second;
+                pTime = refIt->first;
+                error.push_back(err);
+            }
             continue;
+        }
+        if (refIt->first > value.first)
+            refIt--;
         err.first = value.first - pTime;
         err.second = value.second - refIt->second;
         pTime = value.first;

@@ -94,44 +94,42 @@ void CsvExport::add(long double time, string column, string type, VariableLength
         return add(time, column, toType<string>(data));
 }
 
-void CsvExport::add(long double time, string column, double value) {
+void CsvExport::add(long double time, string& column, double value) {
     add(time, column, to_string(value));
 }
 
-void CsvExport::add(long double time, string column, float value) {
+void CsvExport::add(long double time, string& column, float value) {
     add(time, column, to_string(value));
 }
 
-void CsvExport::add(long double time, string column, int value) {
+void CsvExport::add(long double time, string& column, int value) {
     add(time, column, to_string(value));
 }
 
-void CsvExport::add(long double time, string column, short value) {
+void CsvExport::add(long double time, string& column, short value) {
     add(time, column, to_string(value));
 }
 
-void CsvExport::add(long double time, string column, long value) {
+void CsvExport::add(long double time, string& column, long value) {
     add(time, column, to_string(value));
 }
 
-void CsvExport::add(long double time, string column, bool value) {
-    add(time, column, string(value ? "true" : "false"));
+void CsvExport::add(long double time, string& column, bool value) {
+    add(time, column, value ? 1 : 0);
 }
 
-void CsvExport::add(long double time, string &column, string value) {
+void CsvExport::add(long double time, string& column, string value) {
     time = round(time * 1.0e5) / 1.0e5;
     if (!done) {
+        if (data.find(time) == data.end())
+            data[time] = vector<string>(headers.size());
+        if (headers.find(column) == headers.end()) {
+            wcerr << "Could not find column " << column.c_str() << endl;
+            return;
+        }
+        data[time].at(headers[column]) = value;
         if (time > measureTime)
             save();
-        else {
-            if (data.find(time) == data.end())
-                data[time] = vector<string>(headers.size());
-            if (headers.find(column) == headers.end()) {
-                wcerr << "Could not find column " << column.c_str() << endl;
-                return;
-            }
-            data[time].at(headers[column]) = value;
-        }
     }
 }
 

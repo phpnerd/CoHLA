@@ -54,7 +54,7 @@ void FmuWrapper::startModelInit(string fmuPath, string name) {
     jm_status = fmi2_import_create_dllfmu(fmu, fmi2_fmu_kind_cs, NULL);
     if (jm_status != jm_status_success)
         throw "Failed to import FMU.";
-    jm_status = fmi2_import_instantiate(fmu, name.c_str(), fmi2_cosimulation, ("file://" + dirPath).c_str(), true);
+    jm_status = fmi2_import_instantiate(fmu, name.c_str(), fmi2_cosimulation, ("file://" + dirPath + "/resources").c_str(), true);
     if (jm_status != jm_status_success)
         throw "Failed to instantiate model.";
     fmi_status = fmi2_import_setup_experiment(fmu, tollerance != 1e-6, tollerance, time, stopTime != 0.0, stopTime);
@@ -159,6 +159,6 @@ fmi2_value_reference_t FmuWrapper::getRef(string name) {
                 varRefs[name] = fmi2_import_get_variable_vr(var);
         }
     }
-    assert(varRefs[name] > 0);
+    assert(varRefs[name] >= 0);
     return varRefs[name];
 }

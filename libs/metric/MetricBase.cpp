@@ -82,5 +82,5 @@ string MetricBase::getType() {
 }
 
 bool MetricBase::isFinished() {
-    return endMetric ? finished : true;
+    return endMetric ? finished : false;
 }

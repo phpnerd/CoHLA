@@ -10,13 +10,11 @@ The project relies on the following dependencies.
 
 * [CMake](https://cmake.org/) 3.5 or higher
 * [Boost](https://www.boost.org/) (system, thread)
-* [Xerces-C](https://xerces.apache.org/xerces-c/)
 * [GLM](https://glm.g-truc.net/0.9.9/index.html) 0.9+
 * [GLFW](http://www.glfw.org/) 3.2.1
 * [OpenRTI](https://sourceforge.net/projects/openrti/) 0.9
 * [FMI-library](https://jmodelica.org/) 2.0.3
 * [Bullet Physics Library](http://bulletphysics.org/wordpress/) 2.86
-* [CodeSynthesis XSD](https://www.codesynthesis.com/products/xsd/)
 
 For running POOSL simulations, the [Rotalumis](http://www.es.ele.tue.nl/poosl/Tools/rotalumis/) simulator is also required.
 

@@ -38,6 +38,7 @@ public:
     bool write(vector<unsigned char>);
     bool writeHexBytes(const string);
     size_t read(unsigned char* buffer, size_t length);
+    string readLine();
     size_t bytesAvailable();
 
     void addCallback(function<void(unsigned char[])>);

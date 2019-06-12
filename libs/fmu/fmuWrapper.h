@@ -17,13 +17,14 @@
 #include <assert.h>
 #include <string>
 #include <set>
+#include <limits>
 
 using namespace std;
 
 class FmuWrapper {
 
 public:
-    FmuWrapper(string fmuFile, string tmpDir, string name, double tollerance = 1e-6, double startTime = 0.0, double stopTime = 0.0);
+    FmuWrapper(string fmuFile, string tmpDir, string name, double tollerance = 1e-6, double startTime = 0.0, double stopTime = std::numeric_limits<double>::max());
     virtual ~FmuWrapper();
     void advanceTime(long double time);
     virtual void updateAttributeValues() = 0;

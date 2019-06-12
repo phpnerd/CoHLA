@@ -33,9 +33,13 @@ void MetricProcessor::run() {
         advanceNextMessage(measureTime);
 }
 
+void MetricProcessor::stop() {
+    stopLogging();
+}
+
 void MetricProcessor::stopLogging() {
     save();
-    stop();
+    federate::stop();
 }
 
 void MetricProcessor::timeAdvanceGrantListener(long double time) {
