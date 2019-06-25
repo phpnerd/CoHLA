@@ -1,0 +1,6 @@
+Environment {
+  RTI {
+    OpenRTI
+    Libraries "/opt/OpenRTI-libs"
+  }
+}

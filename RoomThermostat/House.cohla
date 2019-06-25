@@ -1,0 +1,130 @@
+import "orti.cohla"
+
+FederateClass Room {
+  Type FMU
+  Attributes {
+    Input Boolean heaterState
+    InOutput Real temperature
+  }
+  Parameters {
+    Real RadiatorSize "radiator.A"
+    Real Surface "Roomcapacity.surface"
+    Real Height "Roomcapacity.height"
+    Real InitTemp "Roomcapacity.initialtemp"
+    Real WindowSize "window.A"
+  }
+  TimePolicy RegulatedAndConstrained
+  DefaultModel "../../Room.fmu"
+  AdvanceType NextMessageRequest
+  DefaultStepSize 5.0
+  DefaultLookahead 0.1
+}
+
+FederateClass Thermostat {
+  Type POOSL {
+    Processes {
+      Thermostat in "Thermostat"
+    }
+  }
+  Attributes {
+    InOutput Real targetTemperature in Thermostat as "targetTemperature"
+    InOutput Real temperature in Thermostat as "temperature"
+    Output Boolean heaterState in Thermostat as "heaterState"
+    Output Real heaterOnTime in Thermostat as "heaterOnTime"
+  }
+  Parameters {
+    Real targetTemperature "targetTemperature" in Thermostat
+  }
+  TimePolicy RegulatedAndConstrained
+  DefaultModel "../../../../POOSL/RoomThermostat/models/StandaloneThermostat.poosl"
+  AdvanceType TimeAdvanceRequest
+  DefaultLookahead 0.1
+}
+
+FederateClass Logger {
+  Type CSV-logger {
+    DefaultMeasureTime 3600.0
+  }
+}
+
+FederateClass LongLogger {
+  Type CSV-logger {
+    DefaultMeasureTime 86400.0
+  }
+}
+
+Configuration Large for Room {
+  Surface = "45.0"
+  WindowSize = "11"
+  RadiatorSize = "1.0"
+}
+
+Configuration Medium for Room {
+  Surface = "10.0"
+  WindowSize = "2.0"
+  RadiatorSize = "0.25"
+}
+
+Configuration Small for Room {
+  Surface = "4.5"
+  WindowSize = "2.5"
+  RadiatorSize = "0.1"
+}
+
+Configuration Comfortable for Thermostat {
+  targetTemperature = "20.5"
+}
+
+Federation House {
+  Instances {
+    Thermostat : Thermostat
+    Livingroom : Room
+    Kitchen : Room
+    Hall : Room
+    log : LongLogger
+  }
+  Connections {
+    { Thermostat.temperature <- Livingroom.temperature }
+    { Livingroom.heaterState <- Thermostat.heaterState }
+    { Kitchen.heaterState <- Thermostat.heaterState }
+    { Hall.heaterState <- Thermostat.heaterState }
+    { log <- Thermostat.targetTemperature, Thermostat.heaterOnTime, Livingroom.temperature, Kitchen.temperature, Hall.temperature }
+  }
+  Situation ComfyBase {
+    Apply Comfortable to Thermostat
+    Apply Large to Livingroom
+    Apply Medium to Kitchen
+    Apply Small to Hall
+  }
+  Situation DefaultBase {
+    Apply Large to Livingroom
+    Apply Medium to Kitchen
+    Apply Small to Hall
+    Init Thermostat.targetTemperature as "14.0"
+  }
+  Scenario RegularDay {
+    AutoStop: 86400.0
+    0.0: Thermostat.targetTemperature = "14.0"      // 00:00
+    21600.0: Thermostat.targetTemperature = "18.5"  // 06:00
+    25200.0: Thermostat.targetTemperature = "16.0"  // 07:00
+    57600.0: Thermostat.targetTemperature = "19.5"  // 16:00
+    64800.0: Thermostat.targetTemperature = "20.0"  // 18:00
+    72000.0: Thermostat.targetTemperature = "20.5"  // 20:00
+    81000.0: Thermostat.targetTemperature = "14.0"  // 22:30
+  }
+  DSE HeaterSizes {
+    SweepMode Independent
+    Scenario RegularDay
+    Situations: ComfyBase
+    Set Livingroom.RadiatorSize: 0.5, 0.75, 1.0, 1.5
+    Set Kitchen.RadiatorSize: 0.1, 0.2, 0.25, 0.3
+    Set Hall.RadiatorSize: 0.025, 0.05, 0.1, 0.15
+  }
+  MetricSet ErrorAndOnTime {
+    MeasureTime: 86400.0
+    Metric OnTime as EndValue Thermostat.heaterOnTime
+    Metric errLivingroom as Error Livingroom.temperature relative to Thermostat.targetTemperature
+    Metric errKitchen as Error Kitchen.temperature relative to Thermostat.targetTemperature
+    Metric errHall as Error Hall.temperature relative to Thermostat.targetTemperature
+  }
+}

@@ -8,16 +8,19 @@ CoHLA was created using [Xtext](https://www.eclipse.org/Xtext/) and [Xtend](http
 ## Structure
 The structure of this repository is as follows.
 
-* **cohla** contains the sources of the DSL itself. At this time, these are still being refactored, so we'll commit them as soon as the refactoring has finished.
 * **docs** contains the documentation regarding both the installation of CoHLA and all of its dependencies as well as a manual on how to use CoHLA and generate code from it.
 * **libs** contains the C++ libraries that have been developed for use with [OpenRTI](https://sourceforge.net/projects/openrti/). CoHLA generates code for use with these libraries.
+* **plugin** contains the compressed plugin file that could be installed in Eclipse.
+* **RoomThermostat** contains the RoomThermostat example project, including a 20-sim model of the room exported as FMU and thermostat model in POOSL.
+* **sources** contains the sources of the DSL itself.
 
 ## Installation
-When the sources will be available, the CoHLA DSL project can be imported by creating a new Xtext project having the name ```nl.ru.sws.cohla``` with extension "cohla".
+The CoHLA DSL project can be imported by creating a new Xtext project having the name ```nl.ru.sws.cohla``` with extension "cohla".
 
-Until then, the CoHLA extension for Eclipse can be installed by adding the repository as software source to Eclipse.
+The CoHLA extension for Eclipse can be installed by adding the repository as software source to Eclipse.
 The repository location is [https://files.thomasnagele.nl/cohla/plugin/](https://files.thomasnagele.nl/cohla/plugin/).
 After having added this repository, the latest version of CoHLA can be installed from it.
+Alternatively, the plugin can be installed from the compressed file located in the *plugin* folder.
 
 To actually run the project, the OpenRTI-libraries located in the *libs* folder should be installed.
 

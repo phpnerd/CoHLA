@@ -1,0 +1,525 @@
+/*
+ * Copyright (c) Thomas Nägele and contributors. All rights reserved.
+ * Licensed under the MIT license. See LICENSE file in the project root for details.
+*/
+
+grammar nl.ru.sws.cohla.CoHLA with org.eclipse.xtext.common.Terminals
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+generate coHLA "http://www.ru.nl/sws/cohla/CoHLA"
+
+Model:
+  (
+    imports+=Import*
+    environment=Environment?
+    federateObjects+=FederateObject*
+    interfaces+=Interface*
+    configurations+=ModelConfiguration*
+    interactions+=Interaction*
+    federations+=Federation*
+  );
+
+Import:
+  'import' importURI=STRING
+;
+
+// ===== HLA Environment =====
+
+Environment:
+  'Environment' '{'
+    rti=HLAImplementation
+    ('SourceDirectory' srcDir=STRING)?
+    ('PrintLevel' printLevel=PrintLevel)?
+    (publishOnlyChanges ?= 'PublishOnlyChanges')?
+  '}'
+;
+
+HLAImplementation:
+  'RTI' '{'
+    implementation=HLAImp
+    'Libraries' libRoot=STRING
+    ('Dependencies' depRoot=STRING)?
+  '}'
+;
+
+enum HLAImp:
+    pitchRti="PitchRTI"
+  | portico="Portico"
+  | openRti="OpenRTI"
+;
+
+enum PrintLevel:
+    state="State"
+  | time="Time"
+  | none="None"
+;
+
+// ===== FederateObject =====
+
+FederateObject:
+  'FederateClass' name=ID '{'
+    'Type' type=FederateType
+    ('{' config=SimulatorConfig '}')?
+    publishedInteractions=PublishedInteractions?
+    subscribedInteractions=SubscribedInteractions?
+    ('Attributes' '{' attributes+=Attribute+ '}')?
+    ('Parameters' '{' parameters+=Parameter+ '}')?
+    ('Purpose' purpose=STRING)?
+    ('TimePolicy' timePolicy=TimePolicy)?
+    ('DefaultModel' defaultModel+=STRING+)?
+    ('AdvanceType' advanceType=AdvanceType)?
+    ('DefaultStepSize' defaultStepSize=P_FLOAT)?
+    ('DefaultLookahead' defaultLookahead=P_FLOAT)?
+    ('SimulationWeight' simulationWeight=INT)?
+  '}'
+;
+
+enum TimePolicy:
+    both="RegulatedAndConstrained"
+  | regulated="Regulated"
+  | constrained="Constrained"
+  | none="None" 
+;
+
+SubscribedInteractions: {SubscribedInteractions}
+  'SubscribedInteractions:'
+    interactions+=[Interaction]+
+;
+
+PublishedInteractions: {PublishedInteractions}
+  'PublishedInteractions:'
+    interactions+=[Interaction]+
+;
+
+Process:
+  name=ID 'in' path=STRING
+;
+
+Parameter:
+  dataType=DataType name=ID alias=STRING ('in' process=[Process])?
+;
+
+SimulatorConfig:
+  POOSLConfig | LoggerConfig
+;
+
+POOSLConfig:
+  'Processes' '{'
+    processes+=Process+
+  '}'
+;
+
+LoggerConfig:
+  'DefaultMeasureTime' defaultMeasureTime=P_FLOAT
+;
+
+enum FederateType:
+    poosl="POOSL"
+  | fmu="FMU"
+  | csv="CSV-logger"
+  | colsim="BulletCollision"
+  | none="None"
+;
+
+enum AdvanceType:
+    time="TimeAdvanceRequest"
+  | message="NextMessageRequest"
+;
+
+// ===== Interaction =====
+
+Interaction:
+  'Interaction' name=ID '{'
+    semanticsProperty=SemanticsProperty?
+    sharingProperty=SharingProperty
+    transportationProperty=TransportationProperty
+    orderProperty=OrderProperty
+    parameters+=ParameterProperty*
+    interactions+=Interaction*
+  '}'
+;
+
+SemanticsProperty:
+  'semantics' semantics=STRING
+;
+
+SharingProperty:
+  'Sharing' sharing=SharingType
+;
+
+ParameterProperty:
+  'Parameter' name=ID
+  dataType=DataTypeProperty
+  'Semantics' semantics=STRING?
+;
+
+DataTypeProperty:
+  'DataType' dataType=DataType
+;
+
+// ===== Attribute =====
+
+Attribute:
+  sharingType=SharingType dataType=DataType (collision?='[Collision]')? ('[' multiInputOperator=MultiInputOperator ']')? name=ID (alias=AliasProperty | processProperty=ProcessProperty)? ('{'
+    updateTypeProperty=UpdateTypeProperty?
+    updateConditionProperty=UpdateConditionProperty?
+    transportationProperty=TransportationProperty?
+    orderProperty=OrderProperty?
+  '}')?
+;
+
+enum SharingType:
+    neither="Void"
+  | publish="Output"
+  | subscribe="Input"
+  | publishSubscribe="InOutput" 
+;
+
+enum DataType:
+    integer="Integer"
+  | long="Long"
+  | string="String"
+  | real="Real"
+  | bool="Boolean"
+;
+
+ProcessProperty:
+  'in' process=[Process] 'as' attributeName=STRING
+;
+
+AliasProperty:
+  'as' alias=STRING
+;
+
+UpdateTypeProperty:
+  'UpdateTypeProperty' updateType=UpdateType
+;
+
+UpdateConditionProperty:
+  'UpdateCondition' updateCondition=UpdateCondition
+;
+
+enum UpdateCondition:
+  onChange="OnChange"
+;
+
+TransportationProperty:
+  'Transportation' transportation=TransportationType  
+;
+
+OrderProperty:
+  'Order' order=OrderType
+;
+
+// ===== ConnectionSet =====
+
+Interface:
+  'ConnectionSet' 'between' class1=[FederateObject] 'and' class2=[FederateObject] '{'
+    connections+=InterfaceConnection+
+  '}'
+;
+
+InterfaceConnection:
+  '{'
+    in=ClassAttributeReference '<-' out=ClassAttributeReference
+  '}'
+;
+
+ClassAttributeReference:
+  objectClass=[FederateObject] '.' attribute=[Attribute]
+;
+
+// ===== Federation =====
+
+Federation:
+  'Federation' name=ID '{'
+    ('Instances' '{'
+      instances+=FederateInstance+
+    '}')?
+    ('Connections' '{'
+      connections+=Connection+
+    '}')?
+    situations+=Situation*
+    scenarios+=Scenario*
+    faultScenarios+=FaultScenario*
+    dses+=DSEConfig*
+    metricSets+=MetricSet*
+    distributions+=Distribution*
+  '}'
+;
+
+FederateInstance:
+  name=ID ':' federate=[FederateObject]
+;
+
+Connection:
+    AttributeConnection
+  | LoggerConnection
+  | ObjectConnection
+;
+
+AttributeConnection:
+  '{'
+    inAttribute=AttributeReference '<-' outAttributes+=AttributeReference
+  '}'
+;
+
+LoggerConnection:
+  '{'
+    logger=[FederateInstance] '<-' outAttributes+=AttributeReference (',' outAttributes+=AttributeReference)*
+  '}'
+;
+
+ObjectConnection:
+  '{'
+    instance1=[FederateInstance] '-' instance2=[FederateInstance]
+  '}'
+;
+
+AttributeReference:
+  instance=[FederateInstance] '.' attribute=[Attribute] 
+;
+
+// ===== Situation =====
+
+Situation:
+  'Situation' name=ID ('extends' extends=[Situation])? '{'
+    elements+=SituationElement+
+  '}'
+;
+
+SituationElement:
+  AttributeInitialiser | ApplyModelConfiguration
+;
+
+AttributeInitialiser:
+  'Init' reference=InstanceParameterReference 'as' value=STRING
+;
+
+InstanceParameterReference:
+  instance=[FederateInstance] '.' attribute=[Parameter]
+;
+
+ApplyModelConfiguration:
+  'Apply' configuration=[ModelConfiguration] 'to' instance=[FederateInstance]
+;
+
+// ===== Configuration =====
+
+ModelConfiguration:
+  'Configuration' name=ID 'for' federateObject=[FederateObject] '{'
+    initAttributes+=AttributeConfigurator+
+   '}'
+;
+
+AttributeConfigurator:
+  reference=ParameterReference '=' value=STRING
+;
+
+ParameterReference:
+  attribute=[Parameter]
+;
+
+// ===== Scenarios =====
+
+Scenario:
+  'Scenario' name=ID '{'
+    settings=ScenarioSettings?
+    events+=Event+
+  '}'
+;
+
+ScenarioSettings:
+  'AutoStop:' (autoStopTime = P_FLOAT | noAutoStop ?= 'no')
+  sockets+=ScenarioSocket*
+;
+
+ScenarioSocket:
+  'Socket' name=ID 'for' instance=[FederateInstance] 'on' host=STRING ':' port=INT
+;
+
+Event:
+  time=P_FLOAT ':' action=Action
+;
+
+Action:
+  ActionAssign | ActionSocket
+;
+
+ActionAssign:
+  attribute=AttributeReference '=' value=STRING
+;
+
+ActionSocket:
+  socket=[ScenarioSocket] '<-' bytes+=HexByte (',' bytes+=HexByte)*
+;
+
+// ===== Faults =====
+
+FaultScenario:
+  'FaultScenario' name=ID '{'
+    faults+=Fault+
+  '}'
+;
+
+Fault:
+  TimedAbsoluteFault | TimedConnectionFault | TimedOffsetFault | AccuracyFault
+;
+
+AccuracyFault:
+  'Variance' 'for' attribute=AttributeReference '=' value=P_FLOAT
+;
+
+TimedAbsoluteFault:
+  range=Range 'set' attribute=AttributeReference '=' value=STRING
+;
+
+TimedConnectionFault:
+  range=Range 'disconnect' attribute=AttributeReference
+;
+
+TimedOffsetFault:
+  range=Range 'offset' attribute=AttributeReference '=' value=C_FLOAT
+;
+
+Range:
+    ('On' time=P_FLOAT)
+  | ('From' startTime=P_FLOAT ('to' endTime=P_FLOAT)?)
+;
+
+// ===== Domain Space Exploration =====
+
+DSEConfig:
+  'DSE' name=ID '{'
+    ('SweepMode' sweepMode=SweepMode)?
+    ('Scenario' scenario=[Scenario])?
+    ('Faults' faultScenario=[FaultScenario])?
+    situations+=DSESituationConfig*
+    configurations+=DSEFederateConfig*
+    attributes+=DSEAttrInit*
+  '}'
+;
+
+DSESituationConfig:
+  'Situations' ':' situations+=[Situation] (',' situations+=[Situation])*
+;
+
+DSEFederateConfig:
+  'Configurations' 'for' instance=[FederateInstance] ':' configurations+=[ModelConfiguration] (',' configurations+=[ModelConfiguration])*
+;
+
+DSEAttrInit:
+  'Set' attr=InstanceParameterReference ':' value=MultiValue
+;
+
+enum SweepMode:
+    independent="Independent"
+  | linked="Linked"
+;
+
+MultiValue:
+  value=(P_FLOAT | C_FLOAT | C_INT | STRING) | values+= (P_FLOAT | C_FLOAT | C_INT | STRING) (',' values+=(P_FLOAT | C_FLOAT | C_INT | STRING))+
+;
+
+// ===== Metrics =====
+
+MetricSet:
+  'MetricSet' name=ID '{'
+    'MeasureTime:' measureTime=P_FLOAT
+    metrics+=Metric+
+  '}' 
+;
+
+Metric:
+  'Metric' name=ID 'as' (metricEV=MetricEndValue | metricErr=MetricError | metricTimer=MetricTimer | metricMinMax=MetricMinMax)
+;
+
+MetricEndValue:
+  absolute?='Absolute'? 'EndValue' attribute=AttributeReference relativeTo=MetricRelativeTo?
+;
+
+MetricError:
+  squared?='Squared'? 'Error' attribute=AttributeReference relativeTo=MetricRelativeTo
+;
+
+MetricTimer:
+  'Timer' 'for' attribute=AttributeReference comparator=Comparator value=(P_FLOAT | C_FLOAT | C_INT | 'true' | 'false') ('(' isEndCondition?='EndCondition' ('after' delay=P_FLOAT)? ')')?
+;
+
+MetricMinMax:
+  (min?='Minimum' | max?= 'Maximum') 'of' attribute=AttributeReference
+;
+
+MetricRelativeTo:
+  'relative' 'to' ref=AttributeReference
+;
+
+// ===== Distributions =====
+
+Distribution:
+  'Distribution' name=ID 'over' nrOfSystems=INT 'systems' '{'
+    systemSets+=SystemSet+
+  '}'
+;
+
+SystemSet:
+  systemId=INT ':' federates+=[FederateInstance]+
+;
+
+// ===== Types =====
+
+HexByte:
+  bytes+=HEXPAIR+
+;
+
+enum OrderType:
+  receive="Receive"
+  | timeStamp="TimeStamp"
+;
+
+enum TransportationType:
+  reliable="Reliable"
+  | bestEffort="BestEffort"
+;
+
+enum UpdateType:
+  conditional="Conditional"
+;
+
+enum Comparator:
+    lt="<"
+  | le="<="
+  | eq="=="
+  | ge=">="
+  | gt=">"
+  | ne="!="
+;
+
+enum MultiInputOperator:
+    none = "NONE"
+  | and = "&&"
+  | or = "||"
+  | plus = "+"
+  | product = "*"
+;
+
+terminal HEXPAIR returns ecore::EString:
+  ('0x'|'x') HEXCHAR HEXCHAR
+;
+
+terminal HEXCHAR returns ecore::EChar:
+  ('0'..'9'|'A'..'F'|'a'..'f')
+;
+
+terminal P_FLOAT returns ecore::EString:
+  INT '.' ('0'..'9')+
+;
+
+terminal C_FLOAT returns ecore::EString:
+  C_INT '.' ('0'..'9')+
+;
+
+terminal C_INT returns ecore::EString:
+  ('-' | '+') INT
+;

@@ -107,24 +107,6 @@ size_t Socket::read(unsigned char* buffer, size_t length) {
     }
 }
 
-string Socket::readLine() {
-    try {
-        string s;
-        boost::system::error_code error;
-        boost::asio::streambuf buf;
-        boost::asio::read_until(*socket, buf, 0x0a, error);
-
-        if (error)
-            throw boost::system::system_error(error);
-        istream is(&buf);
-        is >> s;
-        return s;
-    } catch (exception& e) {
-        wcerr << "Error: " << e.what() << endl;
-        return nullptr;
-    }
-}
-
 size_t Socket::bytesAvailable() {
     return socket->available();
 }

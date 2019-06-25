@@ -1,0 +1,35 @@
+process class Thermostat(
+	initTarget : Real,
+	initTemperature : Real,
+	initHeaterState : Boolean,
+	period : Integer)
+ports
+messages
+variables
+	temperature, targetTemperature, heaterOnTime : Real
+	heaterState : Boolean
+init
+	init()()
+methods
+	init()()
+		temperature := initTemperature;
+		targetTemperature := initTarget;
+		heaterState := initHeaterState;
+		heaterOnTime := 0.0;
+		cycle()()
+	cycle()()
+		delay period;
+		if (temperature < (targetTemperature * 0.985)) & !heaterState then
+			heaterState := true
+		else if (temperature > (targetTemperature * 1.015)) & heaterState then
+			heaterState :=false
+		fi fi;
+		if heaterState then
+			heaterOnTime := heaterOnTime + period asReal
+		fi;
+		cycle()()
+		
+system
+instances
+	Thermostat : Thermostat(initTarget := 20.0, initTemperature := 18.0, initHeaterState := false, period := 30)
+channels

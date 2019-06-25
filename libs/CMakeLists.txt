@@ -36,6 +36,7 @@ link_directories(${DEPENDENCY_ROOT}/lib)
 find_package(Boost REQUIRED COMPONENTS system thread)
 link_directories(${Boost_LIBRARY_DIRS})
 
+find_package(XercesC)
 find_package(Bullet)
 find_library(RTI1516e rti1516e)
 find_library(FedTime1516e fedtime1516e)
@@ -60,7 +61,6 @@ option(BUILD_TESTS "Whether to build or not to build all test executables." OFF)
 if(BUILD_TESTS)
 	set(BUILD_SOCKET_TEST ON)
 	set(BUILD_COLLISION_TEST ON)
-	set(BUILD_POOSL_TEST ON)
 endif()
 
 set(ORTI_UTIL_DIR ${PROJECT_SOURCE_DIR}/utils)
@@ -91,25 +91,10 @@ target_link_libraries(rti ${RTI1516e} ${FedTime1516e} ${ADD_RTI_LIB})
 target_include_directories(rti PUBLIC include)
 
 set(POOSL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/poosl)
-file(GLOB POOSL_SOURCE_FILES
-		${POOSL_SOURCE_DIR}/PooslAttributeMessage.cpp
-		${POOSL_SOURCE_DIR}/PooslAttributeMessage.h
-		${POOSL_SOURCE_DIR}/PooslInteractionMessage.cpp
-		${POOSL_SOURCE_DIR}/PooslInteractionMessage.h
-		${POOSL_SOURCE_DIR}/PooslMessage.cpp
-		${POOSL_SOURCE_DIR}/PooslMessage.h
-		${POOSL_SOURCE_DIR}/PooslSimulator.cpp
-		${POOSL_SOURCE_DIR}/PooslSimulator.h
-		${POOSL_SOURCE_DIR}/PooslTimeMessage.cpp
-		${POOSL_SOURCE_DIR}/PooslTimeMessage.h)
+file(GLOB_RECURSE POOSL_SOURCE_FILES ${POOSL_SOURCE_DIR}/*)
 file(GLOB_RECURSE POOSL_HEADER_FILES ${POOSL_SOURCE_DIR}/*.h*)
 add_library(poosl ${POOSL_SOURCE_FILES})
-target_link_libraries(poosl socket ${Boost_LIBRARIES})
-if(BUILD_POOSL_TEST)
-	add_executable(poosl_test ${POOSL_SOURCE_DIR}/test.cpp)
-	target_link_libraries(poosl_test poosl)
-	set(EXTRA_TARGETS ${EXTRA_TARGETS} poosl_test)
-endif()
+target_link_libraries(poosl socket ${XercesC_LIBRARY})
 target_include_directories(poosl PUBLIC include)
 
 set(FMU_SOURCE_DIR ${PROJECT_SOURCE_DIR}/fmu)

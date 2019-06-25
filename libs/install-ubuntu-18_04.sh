@@ -31,7 +31,7 @@ sudo apt-get -qy upgrade
 
 #Install dependencies
 echo "[System] Installing dependencies"
-sudo apt-get -qy install build-essential cmake git libglm-dev libglfw3-dev libboost-system-dev libboost-thread-dev openjdk-8-jdk python3 unzip
+sudo apt-get -qy install build-essential cmake git libglm-dev libglfw3-dev libboost-system-dev libboost-thread-dev libxerces-c-dev openjdk-8-jdk python3 unzip
 # Create and move into temp directory
 if [ ! -d $TMP_DIR ]; then
   mkdir $TMP_DIR
@@ -91,6 +91,15 @@ make -j${NR_OF_CORES} >> $BULLET_LOG 2>&1
 sudo make install >> $BULLET_LOG
 echo "[Bullet] Installed"
 cd $TMP_DIR
+
+# Install CodeSynthesis XSD
+echo "[CS-XSD] Downloading"
+if [ ! -f cs-xsd.deb ]; then
+  wget -O cs-xsd.deb https://www.codesynthesis.com/download/xsd/4.0/linux-gnu/x86_64/xsd_4.0.0-1_amd64.deb -Lq
+fi
+echo "[CS-XSD] Installing"
+sudo dpkg -i cs-xsd.deb
+echo "[CS-XSD] Installed"
 
 # Install OpenRTI-libs
 if [ ! -d OpenRTI-libs ]; then
