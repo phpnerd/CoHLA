@@ -33,7 +33,7 @@ T ErrorMetric<T>::compute() {
             }
             continue;
         }
-        if (refIt->first > value.first)
+        if (refIt != refData.begin() && refIt->first > value.first)
             refIt--;
         err.first = value.first - pTime;
         err.second = value.second - refIt->second;
