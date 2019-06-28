@@ -36,7 +36,7 @@ dse = OrderedDict()
 dseMetricResults = OrderedDict()
 logDir = "logs/" + startTime + "/"
 rotalumisPort = 10001
-rotalumisExecutable = "rotalumis.debug"
+rotalumisExecutable = "rotalumis"
 
 rtinodeCommand = "rtinode"
 
