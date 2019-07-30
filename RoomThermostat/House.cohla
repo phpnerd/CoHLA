@@ -14,7 +14,7 @@ FederateClass Room {
     Real WindowSize "window.A"
   }
   TimePolicy RegulatedAndConstrained
-  DefaultModel "../../Room.fmu"
+  DefaultModel "../../models/Room.fmu"
   AdvanceType NextMessageRequest
   DefaultStepSize 5.0
   DefaultLookahead 0.1
@@ -36,7 +36,7 @@ FederateClass Thermostat {
     Real targetTemperature "targetTemperature" in Thermostat
   }
   TimePolicy RegulatedAndConstrained
-  DefaultModel "../../../../POOSL/RoomThermostat/models/StandaloneThermostat.poosl"
+  DefaultModel "../../models/StandaloneThermostat.poosl"
   AdvanceType TimeAdvanceRequest
   DefaultLookahead 0.1
 }
