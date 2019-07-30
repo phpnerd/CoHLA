@@ -109,7 +109,8 @@ if [ ! -d OpenRTI-libs ]; then
     tar xf ../OpenRTI-libs.tar.gz -C OpenRTI-libs
   else
     echo "[ORTI-libs] Downloading"
-    git clone https://gitlab.science.ru.nl/tnagele/OpenRTI-libs.git
+    git clone https://github.com/phpnerd/CoHLA.git CoHLA
+    ln -s CoHLA/libs OpenRTI-libs
   fi
   cd OpenRTI-libs
 else
