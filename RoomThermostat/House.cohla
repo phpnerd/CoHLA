@@ -81,7 +81,7 @@ Federation House {
     Livingroom : Room
     Kitchen : Room
     Hall : Room
-    log : LongLogger
+    log : Logger
   }
   Connections {
     { Thermostat.temperature <- Livingroom.temperature }
