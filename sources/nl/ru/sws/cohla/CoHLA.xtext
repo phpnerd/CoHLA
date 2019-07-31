@@ -16,7 +16,6 @@ Model:
     federateObjects+=FederateObject*
     interfaces+=Interface*
     configurations+=ModelConfiguration*
-    interactions+=Interaction*
     federations+=Federation*
   );
 
@@ -61,11 +60,8 @@ FederateObject:
   'FederateClass' name=ID '{'
     'Type' type=FederateType
     ('{' config=SimulatorConfig '}')?
-    publishedInteractions=PublishedInteractions?
-    subscribedInteractions=SubscribedInteractions?
     ('Attributes' '{' attributes+=Attribute+ '}')?
     ('Parameters' '{' parameters+=Parameter+ '}')?
-    ('Purpose' purpose=STRING)?
     ('TimePolicy' timePolicy=TimePolicy)?
     ('DefaultModel' defaultModel+=STRING+)?
     ('AdvanceType' advanceType=AdvanceType)?
@@ -80,16 +76,6 @@ enum TimePolicy:
   | regulated="Regulated"
   | constrained="Constrained"
   | none="None" 
-;
-
-SubscribedInteractions: {SubscribedInteractions}
-  'SubscribedInteractions:'
-    interactions+=[Interaction]+
-;
-
-PublishedInteractions: {PublishedInteractions}
-  'PublishedInteractions:'
-    interactions+=[Interaction]+
 ;
 
 Process:
@@ -125,37 +111,6 @@ enum FederateType:
 enum AdvanceType:
     time="TimeAdvanceRequest"
   | message="NextMessageRequest"
-;
-
-// ===== Interaction =====
-
-Interaction:
-  'Interaction' name=ID '{'
-    semanticsProperty=SemanticsProperty?
-    sharingProperty=SharingProperty
-    transportationProperty=TransportationProperty
-    orderProperty=OrderProperty
-    parameters+=ParameterProperty*
-    interactions+=Interaction*
-  '}'
-;
-
-SemanticsProperty:
-  'semantics' semantics=STRING
-;
-
-SharingProperty:
-  'Sharing' sharing=SharingType
-;
-
-ParameterProperty:
-  'Parameter' name=ID
-  dataType=DataTypeProperty
-  'Semantics' semantics=STRING?
-;
-
-DataTypeProperty:
-  'DataType' dataType=DataType
 ;
 
 // ===== Attribute =====

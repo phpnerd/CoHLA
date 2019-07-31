@@ -21,7 +21,11 @@ import org.eclipse.xtext.validation.Check
 
 import static nl.ru.sws.cohla.coHLA.CoHLAPackage.Literals.*
 
-
+/**
+ * This class contains custom validation rules. 
+ *
+ * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
+ */
 class CoHLAValidator extends AbstractCoHLAValidator {
   
   @Check

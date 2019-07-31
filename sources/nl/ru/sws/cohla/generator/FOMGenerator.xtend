@@ -8,14 +8,12 @@ package nl.ru.sws.cohla.generator
 import java.util.List
 import nl.ru.sws.cohla.coHLA.Attribute
 import nl.ru.sws.cohla.coHLA.FederateObject
-import nl.ru.sws.cohla.coHLA.Interaction
-import nl.ru.sws.cohla.coHLA.ParameterProperty
 
 import static nl.ru.sws.cohla.generator.HLAUtils.*
 
 class FOMGenerator {
   
-  static def generate(List<FederateObject> federateObjects, List<Interaction> interactions, String name, boolean hasMetrics) '''
+  static def generate(List<FederateObject> federateObjects, String name, boolean hasMetrics) '''
 <?xml version='1.0' encoding='utf-8'?>
 <objectModel 
  xmlns='http://standards.ieee.org/IEEE1516-2010'
@@ -55,7 +53,6 @@ class FOMGenerator {
       <sharing>Neither</sharing>
       <transportation>HLAreliable</transportation>
       <order>TimeStamp</order>
-      «interactions.map[generate].join('\n')»
     </interactionClass>
   </interactions>
   <dimensions/>
@@ -131,20 +128,4 @@ class FOMGenerator {
   <semantics>N/A</semantics>
 </attribute>'''
 
-  static def generate(Interaction i)
-'''<interactionClass>
-  <name>«i.name»</name>
-  <sharing>«i.sharingProperty.sharing»</sharing>
-  <transportation>«i.transportationProperty.transportation»</transportation>
-  <order>«i.orderProperty.order»</order>
-  «i.parameters.map[generate].join('\n')»
-</interactionClass>'''
-
-  static def generate(ParameterProperty p)
-'''<parameter>
-  <name>«p.name»</name>
-  <dataType>«toHla(p.dataType.dataType)»</dataType>
-  <semantics>N/A</semantics>
-</parameter>'''
-  
 }

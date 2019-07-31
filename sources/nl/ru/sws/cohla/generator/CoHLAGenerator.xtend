@@ -10,7 +10,6 @@ import nl.ru.sws.cohla.coHLA.Environment
 import nl.ru.sws.cohla.coHLA.FederateObject
 import nl.ru.sws.cohla.coHLA.Federation
 import nl.ru.sws.cohla.coHLA.Import
-import nl.ru.sws.cohla.coHLA.Interaction
 import nl.ru.sws.cohla.coHLA.Interface
 import nl.ru.sws.cohla.coHLA.Model
 import nl.ru.sws.cohla.coHLA.ModelConfiguration
@@ -19,14 +18,17 @@ import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 
-
+/**
+ * Generates code from your model files on save.
+ * 
+ * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
+ */
 class CoHLAGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
         var env = resource.allContents.findLast[e | e instanceof Environment] as Environment;
         val federateObjects = resource.allContents.filter[e | e instanceof FederateObject].map[e | e as FederateObject].toList;
         val configurations = resource.allContents.filter[e | e instanceof ModelConfiguration].map[e | e as ModelConfiguration].toList;
-        val interactions = resource.allContents.filter[e | e instanceof Interaction].map[e | e as Interaction].toList;
         val federations = resource.allContents.filter[e | e instanceof Federation].map[e | e as Federation].toList;
         val imports = resource.allContents.filter[e | e instanceof Import].map[e | e as Import].toList;
         val modelConfigurations = resource.allContents.filter[e | e instanceof ModelConfiguration].map[e | e as ModelConfiguration].toList;
@@ -43,8 +45,6 @@ class CoHLAGenerator extends AbstractGenerator {
             federateObjects.addAll(importedModel.federateObjects)
           if (importedModel.configurations !== null && !importedModel.configurations.empty)
             configurations.addAll(importedModel.configurations)
-          if (importedModel.interactions !== null && !importedModel.interactions.empty)
-            interactions.addAll(importedModel.interactions)
           if (importedModel.federations !== null && !importedModel.federations.empty)
             federations.addAll(importedModel.federations)
           if (importedModel.configurations !== null && !importedModel.configurations.empty)
@@ -57,7 +57,7 @@ class CoHLAGenerator extends AbstractGenerator {
           return;
         }
         val projectName = resource.URI.trimFileExtension.lastSegment.toFirstUpper;
-        fsa.generateFile(projectName + "/fom.xml", FOMGenerator.generate(federateObjects, interactions, projectName, federations.exists[f | !f.metricSets.empty]));
+        fsa.generateFile(projectName + "/fom.xml", FOMGenerator.generate(federateObjects, projectName, federations.exists[f | !f.metricSets.empty]));
         switch env.rti.implementation {
           case OPEN_RTI: {
             println("Generating code for OpenRTI..")
