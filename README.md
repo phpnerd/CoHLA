@@ -1,5 +1,5 @@
 # CoHLA
-Configuring HLA (CoHLA) is a domain specific language to rapidly construct HLA-based co-simulations from a set of models.
+Configuring HLA ([CoHLA](https://cohla.nl/)) is a domain specific language to rapidly construct HLA-based co-simulations from a set of models.
 CoHLA was introduced on the Conference on Industrial Cyber-Physical Systems (ICPS) 2018 in Saint Petersburg [[1]](https://thomasnagele.nl/papers/ICPS2018/).
 CoHLA was created using [Xtext](https://www.eclipse.org/Xtext/) and [Xtend](https://www.eclipse.org/xtend/) for [Eclipse](https://www.eclipse.org/).
 
@@ -18,7 +18,7 @@ The structure of this repository is as follows.
 The CoHLA DSL project can be imported by creating a new Xtext project having the name ```nl.ru.sws.cohla``` with extension "cohla".
 
 The CoHLA extension for Eclipse can be installed by adding the repository as software source to Eclipse.
-The repository location is [https://files.thomasnagele.nl/cohla/plugin/](https://files.thomasnagele.nl/cohla/plugin/).
+The repository location is [https://downloads.cohla.nl/plugin/](https://downloads.cohla.nl/plugin/).
 After having added this repository, the latest version of CoHLA can be installed from it.
 Alternatively, the plugin can be installed from the compressed file located in the *plugin* folder.
 
