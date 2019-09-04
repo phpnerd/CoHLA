@@ -112,6 +112,12 @@ Federation House {
     72000.0: Thermostat.targetTemperature = "20.5"  // 20:00
     81000.0: Thermostat.targetTemperature = "14.0"  // 22:30
   }
+  FaultScenario BrokenCables {
+    Variance for Livingroom.temperature = 0.03
+    From 300.0 to 480.0 set Thermostat.heaterState = "false"
+    From 1500.0 to 2100.0 disconnect Livingroom.temperature
+    From 2700.0 disconnect Thermostat.heaterState
+  }
   DSE HeaterSizes {
     SweepMode Independent
     Scenario RegularDay
